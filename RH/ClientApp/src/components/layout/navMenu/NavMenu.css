@@ -1,0 +1,21 @@
+﻿aside {
+  background-color: var(--bs-dark);
+  height: calc(100vh - 56px);
+  flex-basis: 240px;
+  padding-top: 50px;
+}
+
+aside .nav-link {
+  border-radius: 5px;
+  margin: 5px;
+  padding: 15px;
+  text-align: center;
+}
+
+aside .nav-link.active {
+  background-color: var(--bs-primary);
+}
+
+aside .nav-link:hover {
+  background-color: var(--bs-primary);
+}
