@@ -4,8 +4,10 @@ import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { EmployeeModal } from "./EmployeeModal";
 import { get, send } from "../../utils/apiService";
 import { Alert } from "../../components/layout/alert";
+import authService from "../../components/api-authorization/AuthorizeService";
 
 export const Employees = () => {
+  const [user, setUser] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -55,7 +57,22 @@ export const Employees = () => {
     fetchData();
   }, [fetchData]);
 
-  if (isLoading) {
+  useEffect(() => {
+    const populateState = async () => {
+      const user = await authService.getUser();
+
+      setUser(user);
+    };
+
+    var subscription = authService.subscribe(() => populateState());
+    populateState();
+
+    return () => {
+      authService.unsubscribe(subscription);
+    };
+  }, []);
+
+  if (isLoading || !user) {
     return (
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexGrow: 1, height: "100%" }}>
         <p>
@@ -67,7 +84,7 @@ export const Employees = () => {
 
   return (
     <div>
-      <EmployeeModal isOpen={isModalOpen} toggle={handleModal} id={currentEmployee} />
+      <EmployeeModal isOpen={isModalOpen} toggle={handleModal} id={currentEmployee} userRole={user.role} />
       <table className="table table-striped" aria-labelledby="tableLabel">
         <thead>
           <tr>
@@ -79,31 +96,40 @@ export const Employees = () => {
         </thead>
         <tbody>
           {employees.length ? (
-            employees.map((employee) => (
-              <tr key={employee.id}>
-                <td>{employee.name}</td>
-                <td>{employee.position.name}</td>
-                <td>{employee.department.name}</td>
-                <td>
-                  <div style={{ display: "flex", gap: 10 }}>
-                    <FontAwesomeIcon
-                      className="formAction"
-                      icon={faPencil}
-                      color="var(--bs-blue)"
-                      title="Editar"
-                      onClick={() => handleEdit(employee.id)}
-                    />
-                    <FontAwesomeIcon
-                      className="formAction"
-                      icon={faTrashCan}
-                      color="var(--bs-red)"
-                      title="Eliminar"
-                      onClick={() => handleDelete(employee.id)}
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))
+            employees
+              .filter((employee) => user.role === "RH" || employee.id === Number(user.employeeId))
+              .map((employee) => (
+                <tr key={employee.id}>
+                  <td>{employee.name}</td>
+                  <td>{employee.position.name}</td>
+                  <td>{employee.department.name}</td>
+                  <td>
+                    {((user.role === "RH" && employee.id !== Number(user.employeeId)) ||
+                      (user.role !== "RH" && employee.id === Number(user.employeeId))) && (
+                      <div style={{ display: "flex", gap: 10 }}>
+                        {
+                          <FontAwesomeIcon
+                            className="formAction"
+                            icon={faPencil}
+                            color="var(--bs-blue)"
+                            title="Editar"
+                            onClick={() => handleEdit(employee.id)}
+                          />
+                        }
+                        {user.role === "RH" && (
+                          <FontAwesomeIcon
+                            className="formAction"
+                            icon={faTrashCan}
+                            color="var(--bs-red)"
+                            title="Eliminar"
+                            onClick={() => handleDelete(employee.id)}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))
           ) : (
             <tr>
               <td colSpan={4} style={{ textAlign: "center" }}>

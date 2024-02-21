@@ -17,7 +17,7 @@ import { get } from "jquery";
 import { SkillsTable } from "../components/skills";
 import { ExperiencesTable } from "../components/experiences/ExperiencesTable";
 
-export const EmployeeModal = ({ isOpen, toggle, id }) => {
+export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [positions, setPositions] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -113,7 +113,7 @@ export const EmployeeModal = ({ isOpen, toggle, id }) => {
 
     fetchData();
   }, [id]);
-
+  console.log(userRole);
   return (
     <Modal isOpen={isOpen} size="lg">
       <ModalHeader>{id ? "Editar" : "Agregar"} Empleado</ModalHeader>
@@ -157,6 +157,7 @@ export const EmployeeModal = ({ isOpen, toggle, id }) => {
                   type="select"
                   value={employee.positionId}
                   onChange={handleChange}
+                  disabled={userRole !== "RH"}
                 >
                   {positions.map((position) => (
                     <option key={position.id} value={position.id}>
@@ -175,6 +176,7 @@ export const EmployeeModal = ({ isOpen, toggle, id }) => {
                   type="select"
                   value={employee.departmentId}
                   onChange={handleChange}
+                  disabled={userRole !== "RH"}
                 >
                   {departments.map((department) => (
                     <option key={department.id} value={department.id}>
@@ -196,6 +198,7 @@ export const EmployeeModal = ({ isOpen, toggle, id }) => {
                   type="number"
                   value={employee.salary}
                   onChange={handleChange}
+                  disabled={userRole !== "RH"}
                 />
               </FormGroup>
             </Col>
@@ -209,6 +212,7 @@ export const EmployeeModal = ({ isOpen, toggle, id }) => {
                   type="date"
                   value={employee.startDate}
                   onChange={handleChange}
+                  disabled={userRole !== "RH"}
                 />
               </FormGroup>
             </Col>
