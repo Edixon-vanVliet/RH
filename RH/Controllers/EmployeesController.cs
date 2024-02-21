@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RH.Data;
@@ -12,10 +13,12 @@ namespace RH.Controllers;
 public class EmployeesController : ControllerBase
 {
     private readonly ApplicationDbContext _applicationDbContext;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public EmployeesController(ApplicationDbContext applicationDbContext)
+    public EmployeesController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager)
     {
         _applicationDbContext = applicationDbContext;
+        _userManager = userManager;
     }
 
     [HttpGet]
@@ -87,6 +90,13 @@ public class EmployeesController : ControllerBase
         if (experienciesToDelete.Any())
             _applicationDbContext.Experiences.RemoveRange(experienciesToDelete);
         await _applicationDbContext.SaveChangesAsync();
+
+        var user = _applicationDbContext.Users.First(user => user.EmployeeId == employee.Id);
+        if (employee.DepartmentId != 1 && await _userManager.IsInRoleAsync(user, "RH"))
+        {
+            await _userManager.RemoveFromRoleAsync(user, "RH");
+            await _userManager.AddToRoleAsync(user, "Employee");
+        }
 
         return Ok();
     }
