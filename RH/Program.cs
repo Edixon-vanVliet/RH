@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using RH;
 using RH.Data;
 using RH.Data.Interceptors;
 using RH.Models;
@@ -14,11 +16,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         .AddInterceptors(new SoftDeleteInterceptor()));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddIdentityServer()
-    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>()
+    .AddProfileService<ProfileService>();
 
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
@@ -27,6 +31,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
+
+await app.SeedData();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

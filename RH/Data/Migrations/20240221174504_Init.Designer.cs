@@ -11,7 +11,7 @@ using RH.Data;
 namespace RH.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240207035241_Init")]
+    [Migration("20240221174504_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -312,6 +312,9 @@ namespace RH.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
 
@@ -346,6 +349,8 @@ namespace RH.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -517,6 +522,12 @@ namespace RH.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("CandidateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -528,6 +539,10 @@ namespace RH.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("Languages");
                 });
@@ -692,6 +707,17 @@ namespace RH.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RH.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("RH.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("RH.Models.Candidate", b =>
                 {
                     b.HasOne("RH.Models.Department", "Department")
@@ -755,6 +781,17 @@ namespace RH.Data.Migrations
                         .HasForeignKey("EmployeeId");
                 });
 
+            modelBuilder.Entity("RH.Models.Language", b =>
+                {
+                    b.HasOne("RH.Models.Candidate", null)
+                        .WithMany("Languages")
+                        .HasForeignKey("CandidateId");
+
+                    b.HasOne("RH.Models.Employee", null)
+                        .WithMany("Languages")
+                        .HasForeignKey("EmployeeId");
+                });
+
             modelBuilder.Entity("RH.Models.Skill", b =>
                 {
                     b.HasOne("RH.Models.Candidate", null)
@@ -781,6 +818,8 @@ namespace RH.Data.Migrations
                 {
                     b.Navigation("Experiences");
 
+                    b.Navigation("Languages");
+
                     b.Navigation("Skills");
 
                     b.Navigation("Trainings");
@@ -789,6 +828,8 @@ namespace RH.Data.Migrations
             modelBuilder.Entity("RH.Models.Employee", b =>
                 {
                     b.Navigation("Experiences");
+
+                    b.Navigation("Languages");
 
                     b.Navigation("Recommendations");
 
