@@ -49,13 +49,18 @@ export const PositionModal = ({ isOpen, toggle, id }) => {
       setErrors((errors) => ({ ...errors, [name]: "Nombre no puede estar vacio" }));
     }
 
-    if (name === "minimumSalary" && Number(value) > Number(position.maximumSalary)) {
-      setErrors((errors) => ({ ...errors, [name]: "Salario minimo no puede ser mayor al salario maximo" }));
+    if (name === "minimumSalary" || name === "maximumSalary") {
+      delete prevErrors["minimumSalary"];
+      delete prevErrors["maximumSalary"];
+      setErrors(prevErrors);
+
+      if (name === "minimumSalary" && Number(value) > Number(position.maximumSalary)) {
+        setErrors((errors) => ({ ...errors, [name]: "Salario minimo no puede ser mayor al salario maximo" }));
+      } else if (name === "maximumSalary" && Number(position.minimumSalary) > Number(value)) {
+        setErrors((errors) => ({ ...errors, [name]: "Salario maximo no puede ser menor al salario minimo" }));
+      }
     }
 
-    if (name === "maximumSalary" && Number(position.minimumSalary) > Number(value)) {
-      setErrors((errors) => ({ ...errors, [name]: "Salario maximo no puede ser menor al salario minimo" }));
-    }
     setPosition((position) => ({ ...position, [name]: name === "risk" ? Number(value) : value }));
   };
 

@@ -16,6 +16,8 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
   const [errors, setErrors] = useState({
     company: "Compañia no puede estar vacio",
     position: "Posicion no puede estar vacio",
+    from: "Fecha de inicio no puede estar vacio",
+    until: "Fecha final no puede estar vacio",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [experience, setExperience] = useState({
