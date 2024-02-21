@@ -78,6 +78,21 @@ namespace RH.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Languages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    State = table.Column<int>(type: "INTEGER", nullable: false),
+                    StateChangedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Languages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PersistedGrants",
                 columns: table => new
                 {
@@ -332,30 +347,34 @@ namespace RH.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Languages",
+                name: "LanguageCandidates",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    LanguageId = table.Column<int>(type: "INTEGER", nullable: false),
                     CandidateId = table.Column<int>(type: "INTEGER", nullable: true),
-                    EmployeeId = table.Column<int>(type: "INTEGER", nullable: true),
-                    State = table.Column<int>(type: "INTEGER", nullable: false),
-                    StateChangedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
+                    EmployeeId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Languages", x => x.Id);
+                    table.PrimaryKey("PK_LanguageCandidates", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Languages_Candidates_CandidateId",
+                        name: "FK_LanguageCandidates_Candidates_CandidateId",
                         column: x => x.CandidateId,
                         principalTable: "Candidates",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Languages_Employees_EmployeeId",
+                        name: "FK_LanguageCandidates_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_LanguageCandidates_Languages_LanguageId",
+                        column: x => x.LanguageId,
+                        principalTable: "Languages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -516,14 +535,19 @@ namespace RH.Data.Migrations
                 column: "Use");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Languages_CandidateId",
-                table: "Languages",
+                name: "IX_LanguageCandidates_CandidateId",
+                table: "LanguageCandidates",
                 column: "CandidateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Languages_EmployeeId",
-                table: "Languages",
+                name: "IX_LanguageCandidates_EmployeeId",
+                table: "LanguageCandidates",
                 column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LanguageCandidates_LanguageId",
+                table: "LanguageCandidates",
+                column: "LanguageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PersistedGrants_ConsumedTime",
@@ -637,7 +661,7 @@ namespace RH.Data.Migrations
                 name: "Keys");
 
             migrationBuilder.DropTable(
-                name: "Languages");
+                name: "LanguageCandidates");
 
             migrationBuilder.DropTable(
                 name: "PersistedGrants");
@@ -653,6 +677,9 @@ namespace RH.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Languages");
 
             migrationBuilder.DropTable(
                 name: "Employees");

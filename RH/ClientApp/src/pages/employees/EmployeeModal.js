@@ -23,6 +23,7 @@ export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [positions, setPositions] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [languages, setLanguages] = useState([]);
   const [employee, setEmployee] = useState({
     id: 0,
     name: "",
@@ -35,6 +36,7 @@ export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
     skills: [],
     trainings: [],
     experiences: [],
+    languages: [],
   });
 
   const clean = () => {
@@ -50,11 +52,12 @@ export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
       skills: [],
       trainings: [],
       experiences: [],
+      languages: [],
     });
     setErrors({});
   };
 
-  const handleChange = ({ target: { name, value } }) => {
+  const handleChange = ({ target: { name, value, selectedOptions } }) => {
     let prevErrors = errors;
     delete prevErrors[name];
     setErrors(prevErrors);
@@ -65,6 +68,10 @@ export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
 
     if (name === "cedula" && value === "") {
       setErrors((errors) => ({ ...errors, [name]: "Cedula no puede estar vacio" }));
+    }
+
+    if (name === "languages") {
+      value = Array.from(selectedOptions, (option) => ({ languageId: option.value, employeeId: id }));
     }
 
     setEmployee((employee) => ({ ...employee, [name]: value }));
@@ -119,6 +126,7 @@ export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
         }
         setPositions(await get("api/positions"));
         setDepartments(await get("api/departments"));
+        setLanguages(await get("api/languages"));
       } catch (error) {
         console.error(error);
       } finally {
@@ -235,6 +243,25 @@ export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
                 />
               </FormGroup>
             </Col>
+          </Row>
+          <Row>
+            <FormGroup>
+              <Label for="languages">Idiomas</Label>
+              <Input
+                id="languages"
+                name="languages"
+                type="select"
+                value={employee.languages?.map((language) => language.languageId)}
+                onChange={handleChange}
+                multiple
+              >
+                {languages?.map((language) => (
+                  <option key={language.id} value={language.id}>
+                    {language.name}
+                  </option>
+                ))}
+              </Input>
+            </FormGroup>
           </Row>
           <Row>
             <Col>

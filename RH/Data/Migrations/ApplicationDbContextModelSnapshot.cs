@@ -519,12 +519,6 @@ namespace RH.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CandidateId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -537,11 +531,33 @@ namespace RH.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.ToTable("Languages");
+                });
+
+            modelBuilder.Entity("RH.Models.LanguageCandidate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CandidateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
                     b.HasIndex("CandidateId");
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("Languages");
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("LanguageCandidates");
                 });
 
             modelBuilder.Entity("RH.Models.Position", b =>
@@ -778,7 +794,7 @@ namespace RH.Data.Migrations
                         .HasForeignKey("EmployeeId");
                 });
 
-            modelBuilder.Entity("RH.Models.Language", b =>
+            modelBuilder.Entity("RH.Models.LanguageCandidate", b =>
                 {
                     b.HasOne("RH.Models.Candidate", null)
                         .WithMany("Languages")
@@ -787,6 +803,12 @@ namespace RH.Data.Migrations
                     b.HasOne("RH.Models.Employee", null)
                         .WithMany("Languages")
                         .HasForeignKey("EmployeeId");
+
+                    b.HasOne("RH.Models.Language", null)
+                        .WithMany("LanguageCandidates")
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RH.Models.Skill", b =>
@@ -833,6 +855,11 @@ namespace RH.Data.Migrations
                     b.Navigation("Skills");
 
                     b.Navigation("Trainings");
+                });
+
+            modelBuilder.Entity("RH.Models.Language", b =>
+                {
+                    b.Navigation("LanguageCandidates");
                 });
 #pragma warning restore 612, 618
         }

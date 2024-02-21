@@ -25,6 +25,8 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
 
     public DbSet<Training> Trainings => Set<Training>();
 
+    public DbSet<LanguageCandidate> LanguageCandidates => Set<LanguageCandidate>();
+
     public ApplicationDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions)
         : base(options, operationalStoreOptions)
     {

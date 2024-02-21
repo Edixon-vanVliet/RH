@@ -11,5 +11,8 @@ public class CandidateConfiguration : IEntityTypeConfiguration<Candidate>
         builder.HasOne(candidate => candidate.RecommendedBy)
             .WithMany(employee => employee.Recommendations)
             .HasForeignKey(candidate => candidate.RecommendedById);
+
+        builder.HasMany(candidate => candidate.Languages)
+            .WithOne();
     }
 }

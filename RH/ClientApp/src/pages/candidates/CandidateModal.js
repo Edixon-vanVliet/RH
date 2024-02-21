@@ -27,6 +27,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
   const [positions, setPositions] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [languages, setLanguages] = useState([]);
   const [candidate, setCandidate] = useState({
     id: 0,
     name: "",
@@ -38,6 +39,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
     skills: [],
     trainings: [],
     experiences: [],
+    languages: [],
   });
 
   const clean = () => {
@@ -52,6 +54,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
       skills: [],
       trainings: [],
       experiences: [],
+      languages: [],
     });
 
     setErrors({
@@ -60,7 +63,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
     });
   };
 
-  const handleChange = ({ target: { name, value } }) => {
+  const handleChange = ({ target: { name, value, selectedOptions } }) => {
     let prevErrors = errors;
     delete prevErrors[name];
     setErrors(prevErrors);
@@ -73,6 +76,10 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
       setErrors((errors) => ({ ...errors, [name]: "Cedula no puede estar vacio" }));
     }
 
+    if (name === "languages") {
+      value = Array.from(selectedOptions, (option) => ({ languageId: option.value, candidateId: id }));
+    }
+
     setCandidate((candidate) => ({ ...candidate, [name]: value }));
   };
 
@@ -82,11 +89,11 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
 
       const updatedCandidate = {
         ...candidate,
-        skills: candidate.skills.map((skill) => ({
+        skills: candidate.skills?.map((skill) => ({
           ...skill,
           id: skill.id > 0 ? skill.id : 0,
         })),
-        experiences: candidate.experiences.map((experience) => ({
+        experiences: candidate.experiences?.map((experience) => ({
           ...experience,
           id: experience.id > 0 ? experience.id : 0,
         })),
@@ -118,6 +125,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
         if (id) {
           setErrors({});
           const candidate = await get(`api/candidates/${id}`);
+
           setCandidate({
             ...candidate,
             recommendedById: candidate.recommendedById ? candidate.recommendedById : undefined,
@@ -126,6 +134,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
         setPositions(await get("api/positions"));
         setDepartments(await get("api/departments"));
         setEmployees(await get("api/employees"));
+        setLanguages(await get("api/languages"));
       } catch (error) {
         console.error(error);
       } finally {
@@ -184,7 +193,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
                   value={candidate.positionId}
                   onChange={handleChange}
                 >
-                  {positions.map((position) => (
+                  {positions?.map((position) => (
                     <option key={position.id} value={position.id}>
                       {position.name}
                     </option>
@@ -202,7 +211,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
                   value={candidate.departmentId}
                   onChange={handleChange}
                 >
-                  {departments.map((department) => (
+                  {departments?.map((department) => (
                     <option key={department.id} value={department.id}>
                       {department.name}
                     </option>
@@ -238,7 +247,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
                   <option value={undefined}>Seleccione...</option>
                   {employees
                     .filter((employee) => employee.id !== id)
-                    .map((employee) => (
+                    ?.map((employee) => (
                       <option key={employee.id} value={employee.id}>
                         {employee.name}
                       </option>
@@ -246,6 +255,25 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
                 </Input>
               </FormGroup>
             </Col>
+          </Row>
+          <Row>
+            <FormGroup>
+              <Label for="languages">Idiomas</Label>
+              <Input
+                id="languages"
+                name="languages"
+                type="select"
+                value={candidate.languages?.map((language) => language.languageId)}
+                onChange={handleChange}
+                multiple
+              >
+                {languages?.map((language) => (
+                  <option key={language.id} value={language.id}>
+                    {language.name}
+                  </option>
+                ))}
+              </Input>
+            </FormGroup>
           </Row>
           <Row>
             <Col>

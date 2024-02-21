@@ -36,7 +36,7 @@ public class EmployeesController : ControllerBase
         var employee = await _applicationDbContext.Employees
             .Include(candidate => candidate.Experiences)
             .Include(candidate => candidate.Skills)
-            .Include(candidate => candidate.Trainings)
+            .Include(candidate => candidate.Languages)
             .SingleOrDefaultAsync(x => x.Id == id);
 
         return employee is null ? NotFound() : Ok(employee);
@@ -74,8 +74,12 @@ public class EmployeesController : ControllerBase
             return NotFound();
         }
 
+        var languagesToDelete = await _applicationDbContext.LanguageCandidates.Where(language => language.EmployeeId == id).ToListAsync();
         var skillsToDelete = employee.Skills.Where(x => !updatedEmployee.Skills.Any(y => y.Id == x.Id)).ToList();
         var experienciesToDelete = employee.Experiences.Where(x => !updatedEmployee.Experiences.Any(y => y.Id == x.Id)).ToList();
+
+        if (languagesToDelete.Any())
+            _applicationDbContext.LanguageCandidates.RemoveRange(languagesToDelete);
 
         _applicationDbContext.Employees.Update(updatedEmployee);
         if (skillsToDelete.Any())

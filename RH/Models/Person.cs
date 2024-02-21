@@ -21,5 +21,6 @@ public abstract class Person : BaseModel
     public List<Training> Trainings { get; } = new List<Training>();
 
     public List<Experience> Experiences { get; set; } = new List<Experience>();
-    public List<Language> Languages { get; set; } = new List<Language>();
+
+    public List<LanguageCandidate> Languages { get; set; } = new List<LanguageCandidate>();
 }

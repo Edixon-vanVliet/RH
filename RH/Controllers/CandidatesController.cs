@@ -38,7 +38,7 @@ public class CandidatesController : ControllerBase
         var candidate = await _applicationDbContext.Candidates
             .Include(candidate => candidate.Experiences)
             .Include(candidate => candidate.Skills)
-            .Include(candidate => candidate.Trainings)
+            .Include(candidate => candidate.Languages)
             .SingleOrDefaultAsync(x => x.Id == id);
 
         return candidate is null ? NotFound() : Ok(candidate);
@@ -63,6 +63,7 @@ public class CandidatesController : ControllerBase
             .AsNoTracking()
             .Include(candidate => candidate.Experiences)
             .Include(candidate => candidate.Skills)
+            .Include(candidate => candidate.Languages)
             .SingleOrDefaultAsync(x => x.Id == id);
 
         if (candidate is null)
@@ -81,8 +82,17 @@ public class CandidatesController : ControllerBase
             StartDate = DateTime.Now,
             Skills = candidate.Skills,
             Experiences = candidate.Experiences,
+            Languages = candidate.Languages.Select(language =>
+            {
+                language.CandidateId = null;
+                language.EmployeeId = 0;
+
+                return language;
+            }).ToList(),
         };
 
+        var languagesToDelete = await _applicationDbContext.LanguageCandidates.Where(language => language.CandidateId == id).ToListAsync();
+        _applicationDbContext.LanguageCandidates.RemoveRange(languagesToDelete);
         _applicationDbContext.Candidates.Remove(candidate);
         await _applicationDbContext.Employees.AddAsync(employee);
         await _applicationDbContext.SaveChangesAsync();
@@ -127,10 +137,15 @@ public class CandidatesController : ControllerBase
             return NotFound();
         }
 
+        var languagesToDelete = await _applicationDbContext.LanguageCandidates.Where(language => language.CandidateId == id).ToListAsync();
         var skillsToDelete = candidate.Skills.Where(x => !updatedCandidate.Skills.Any(y => y.Id == x.Id)).ToList();
         var experienciesToDelete = candidate.Experiences.Where(x => !updatedCandidate.Experiences.Any(y => y.Id == x.Id)).ToList();
 
+        if (languagesToDelete.Any())
+            _applicationDbContext.LanguageCandidates.RemoveRange(languagesToDelete);
+
         _applicationDbContext.Candidates.Update(updatedCandidate);
+
         if (skillsToDelete.Any())
             _applicationDbContext.Skills.RemoveRange(skillsToDelete);
         if (experienciesToDelete.Any())
