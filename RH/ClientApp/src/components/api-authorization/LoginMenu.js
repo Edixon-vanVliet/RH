@@ -50,7 +50,7 @@ const authenticatedView = (userName, profilePath, logoutPath, logoutState) => (
   <Fragment>
     <Navbar className="authenticatedNav">
       <NavLink tag={Link} className="text-light" to={profilePath}>
-        Hello {userName}
+        Hola {userName}
       </NavLink>
       <NavLink replace tag={Link} className="text-light" to={logoutPath} state={logoutState}>
         Logout

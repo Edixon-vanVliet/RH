@@ -13,7 +13,7 @@ export const Menu = () => {
             RH
           </NavLink>
         </h1>
-        {/* <LoginMenu /> */}
+        <LoginMenu />
       </div>
     </header>
   );

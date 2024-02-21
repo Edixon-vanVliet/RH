@@ -13,27 +13,27 @@ const AppRoutes = [
   },
   {
     path: "/positions",
-    // requireAuth: true,
+    requireAuth: true,
     element: <Positions />,
   },
   {
     path: "/candidates",
-    // requireAuth: true,
+    requireAuth: true,
     element: <Candidates />,
   },
   {
     path: "/employees",
-    // requireAuth: true,
+    requireAuth: true,
     element: <Employees />,
   },
   {
     path: "/departments",
-    // requireAuth: true,
+    requireAuth: true,
     element: <Departments />,
   },
   {
     path: "/languages",
-    // requireAuth: true,
+    requireAuth: true,
     element: <Languages />,
   },
   ...ApiAuthorzationRoutes,
