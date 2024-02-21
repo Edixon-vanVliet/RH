@@ -111,7 +111,7 @@ export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
       try {
         if (id) {
           var employee = await get(`api/employees/${id}`);
-
+          setErrors({});
           setEmployee({
             ...employee,
             startDate: employee.startDate.substring(0, 10),
@@ -128,7 +128,7 @@ export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
 
     fetchData();
   }, [id]);
-  console.log(userRole);
+
   return (
     <Modal isOpen={isOpen} size="lg">
       <ModalHeader>{id ? "Editar" : "Agregar"} Empleado</ModalHeader>

@@ -59,6 +59,7 @@ export const SkillModal = ({ isOpen, toggle, currentSkill, onChange }) => {
 
   useEffect(() => {
     if (currentSkill) {
+      setErrors({});
       setSkill(currentSkill);
     }
   }, [currentSkill]);

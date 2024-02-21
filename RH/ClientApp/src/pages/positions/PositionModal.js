@@ -84,6 +84,7 @@ export const PositionModal = ({ isOpen, toggle, id }) => {
 
   useEffect(() => {
     if (id) {
+      setErrors({});
       const fetchData = async () => {
         setIsLoading(true);
         try {

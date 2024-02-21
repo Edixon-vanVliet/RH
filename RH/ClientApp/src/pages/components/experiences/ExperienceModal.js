@@ -92,6 +92,7 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
 
   useEffect(() => {
     if (currentExperience) {
+      setErrors({});
       setExperience(currentExperience);
     }
   }, [currentExperience]);

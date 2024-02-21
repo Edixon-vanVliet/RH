@@ -116,6 +116,7 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
       setIsLoading(true);
       try {
         if (id) {
+          setErrors({});
           const candidate = await get(`api/candidates/${id}`);
           setCandidate({
             ...candidate,

@@ -64,6 +64,7 @@ export const LanguageModal = ({ isOpen, toggle, id }) => {
 
   useEffect(() => {
     if (id) {
+      setErrors({});
       const fetchData = async () => {
         setIsLoading(true);
         try {
