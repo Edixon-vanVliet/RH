@@ -101,9 +101,11 @@ export const Employees = () => {
 
   return (
     <div>
-      <Button type="button" className="btn btn-success float-end" onClick={handleDownload}>
-        <FontAwesomeIcon icon={faTable} /> Descargar reporte
-      </Button>
+      {user.role === "RH" && (
+        <Button type="button" className="btn btn-success float-end" onClick={handleDownload}>
+          <FontAwesomeIcon icon={faTable} /> Descargar reporte
+        </Button>
+      )}
       <EmployeeModal isOpen={isModalOpen} toggle={handleModal} id={currentEmployee} userRole={user.role} />
       <table className="table table-striped" aria-labelledby="tableLabel">
         <thead>
