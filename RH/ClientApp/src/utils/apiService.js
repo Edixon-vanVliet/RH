@@ -9,6 +9,15 @@ export const get = async (url) => {
   return await response.json();
 };
 
+export const getBlob = async (url) => {
+  const token = await authService.getAccessToken();
+  const response = await fetch(url, {
+    headers: !token ? {} : { Authorization: `Bearer ${token}` },
+  });
+
+  return await response.blob();
+};
+
 export const send = async (url, payload, method) => {
   const token = await authService.getAccessToken();
   const response = await fetch(url, {

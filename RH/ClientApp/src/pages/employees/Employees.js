@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencil, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faPencil, faTrashCan, faTable } from "@fortawesome/free-solid-svg-icons";
 import { EmployeeModal } from "./EmployeeModal";
-import { get, send } from "../../utils/apiService";
+import { get, getBlob, send } from "../../utils/apiService";
 import { Alert } from "../../components/layout/alert";
 import authService from "../../components/api-authorization/AuthorizeService";
+import { Button } from "reactstrap";
 
 export const Employees = () => {
   const [user, setUser] = useState(undefined);
@@ -53,6 +54,22 @@ export const Employees = () => {
     await fetchData();
   };
 
+  const handleDownload = async () => {
+    try {
+      const data = await getBlob("api/employees/report");
+
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `empleados_${new Date().toISOString().substring(0, 10)}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch {
+      console.log("error downloading report");
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -84,6 +101,9 @@ export const Employees = () => {
 
   return (
     <div>
+      <Button type="button" className="btn btn-success float-end" onClick={handleDownload}>
+        <FontAwesomeIcon icon={faTable} /> Descargar reporte
+      </Button>
       <EmployeeModal isOpen={isModalOpen} toggle={handleModal} id={currentEmployee} userRole={user.role} />
       <table className="table table-striped" aria-labelledby="tableLabel">
         <thead>

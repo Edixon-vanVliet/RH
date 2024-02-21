@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RH.Data;
 using RH.Models;
+using System.Data;
 
 namespace RH.Controllers;
 
@@ -101,5 +103,32 @@ public class EmployeesController : ControllerBase
         await _applicationDbContext.SaveChangesAsync();
 
         return Ok();
+    }
+
+    [HttpGet("report")]
+    public async Task<IActionResult> GetReport()
+    {
+        var employees = await _applicationDbContext.Employees
+            .Include(employee => employee.Department)
+            .Include(employee => employee.Position)
+            .ToListAsync();
+
+        using var workbook = new XLWorkbook();
+        var worksheet = workbook.AddWorksheet("Nuevos Empleados");
+        var columnNames = typeof(EmployeeDto).GetProperties();
+        var currentColumn = 1;
+
+        foreach (var column in columnNames)
+        {
+            worksheet.Cell(1, currentColumn).Value = column.Name;
+            currentColumn++;
+        }
+
+        worksheet.Cell(2, 1).InsertData(employees.Select(employee => new EmployeeDto(employee)));
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+
+        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "empleados.xlsx");
     }
 }
