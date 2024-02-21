@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RH.Data;
 using RH.Models;
@@ -11,9 +12,12 @@ public class CandidatesController : ControllerBase
 {
     private readonly ApplicationDbContext _applicationDbContext;
 
-    public CandidatesController(ApplicationDbContext applicationDbContext)
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public CandidatesController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager)
     {
         _applicationDbContext = applicationDbContext;
+        _userManager = userManager;
     }
 
     [HttpGet]
@@ -82,6 +86,21 @@ public class CandidatesController : ControllerBase
         _applicationDbContext.Candidates.Remove(candidate);
         await _applicationDbContext.Employees.AddAsync(employee);
         await _applicationDbContext.SaveChangesAsync();
+
+        var username = $"{employee.Name.Replace(" ", ".").ToLower()}@rh.com";
+        var user = new ApplicationUser()
+        {
+            Email = username,
+            EmailConfirmed = true,
+            PhoneNumberConfirmed = true,
+            TwoFactorEnabled = false,
+            EmployeeId = employee.Id,
+            LockoutEnabled = false,
+            UserName = username,
+        };
+
+        await _userManager.CreateAsync(user, "Aa!12345");
+        await _userManager.AddToRoleAsync(user, employee.DepartmentId == 1 ? "RH" : "Employee");
 
         return CreatedAtAction(nameof(Post), new { employee.Id });
     }
