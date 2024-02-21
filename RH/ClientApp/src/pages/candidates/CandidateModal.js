@@ -3,6 +3,7 @@ import {
   Button,
   Col,
   Form,
+  FormFeedback,
   FormGroup,
   Input,
   Label,
@@ -17,6 +18,11 @@ import { SkillsTable } from "../components/skills";
 import { ExperiencesTable } from "../components/experiences/ExperiencesTable";
 
 export const CandidateModal = ({ isOpen, toggle, id }) => {
+  const [errors, setErrors] = useState({
+    name: "Nombre no puede estar vacio",
+    cedula: "Cedula no puede estar vacio",
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [positions, setPositions] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -47,9 +53,26 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
       trainings: [],
       experiences: [],
     });
+
+    setErrors({
+      name: "Nombre no puede estar vacio",
+      cedula: "Cedula no puede estar vacio",
+    });
   };
 
   const handleChange = ({ target: { name, value } }) => {
+    let prevErrors = errors;
+    delete prevErrors[name];
+    setErrors(prevErrors);
+
+    if (name === "name" && value === "") {
+      setErrors((errors) => ({ ...errors, [name]: "Nombre no puede estar vacio" }));
+    }
+
+    if (name === "cedula" && value === "") {
+      setErrors((errors) => ({ ...errors, [name]: "Cedula no puede estar vacio" }));
+    }
+
     setCandidate((candidate) => ({ ...candidate, [name]: value }));
   };
 
@@ -128,7 +151,9 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
                   type="text"
                   value={candidate.name}
                   onChange={handleChange}
+                  invalid={Object.keys(errors).includes("name")}
                 />
+                <FormFeedback>{errors["name"]}</FormFeedback>
               </FormGroup>
             </Col>
             <Col>
@@ -141,7 +166,9 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
                   type="text"
                   value={candidate.cedula}
                   onChange={handleChange}
+                  invalid={Object.keys(errors).includes("cedula")}
                 />
+                <FormFeedback>{errors["cedula"]}</FormFeedback>
               </FormGroup>
             </Col>
           </Row>
@@ -233,7 +260,12 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
         <Button type="button" className="btn btn-secondary" onClick={handleCancel}>
           Cancelar
         </Button>
-        <Button type="button" className="btn btn-primary" onClick={handleSave} disabled={isLoading}>
+        <Button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleSave}
+          disabled={isLoading || Object.keys(errors).length}
+        >
           Confirmar
         </Button>
       </ModalFooter>

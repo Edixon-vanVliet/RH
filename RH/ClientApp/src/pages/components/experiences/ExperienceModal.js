@@ -1,7 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import {
+  Button,
+  Form,
+  FormFeedback,
+  FormGroup,
+  Input,
+  Label,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from "reactstrap";
 
 export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange }) => {
+  const [errors, setErrors] = useState({
+    company: "Compañia no puede estar vacio",
+    position: "Posicion no puede estar vacio",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [experience, setExperience] = useState({
     id: 0,
@@ -21,9 +36,38 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
       until: "",
       salary: 0,
     });
+
+    setErrors({
+      company: "Compañia no puede estar vacio",
+      position: "Posicion no puede estar vacio",
+    });
   };
 
   const handleChange = ({ target: { name, value } }) => {
+    let prevErrors = errors;
+    delete prevErrors[name];
+    setErrors(prevErrors);
+
+    if (name === "company" && value === "") {
+      setErrors((errors) => ({ ...errors, [name]: "Compañia no puede estar vacio" }));
+    }
+
+    if (name === "position" && value === "") {
+      setErrors((errors) => ({ ...errors, [name]: "Posicion no puede estar vacio" }));
+    }
+
+    if (name === "from" && new Date(value) > new Date(experience.until)) {
+      setErrors((errors) => ({ ...errors, [name]: "Fecha de inicio no puede ser mayor a la fecha final" }));
+    }
+
+    if (name === "from" && new Date(value) > new Date()) {
+      setErrors((errors) => ({ ...errors, [name]: "Fecha de inicio no puede ser mayor a la de hoy" }));
+    }
+
+    if (name === "until" && new Date(value) < new Date(experience.from)) {
+      setErrors((errors) => ({ ...errors, [name]: "Fecha final no puede ser menor a la fecha de inicio" }));
+    }
+
     setExperience((experience) => ({ ...experience, [name]: value }));
   };
 
@@ -66,7 +110,9 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
               type="text"
               value={experience.company}
               onChange={handleChange}
+              invalid={Object.keys(errors).includes("company")}
             />
+            <FormFeedback>{errors["company"]}</FormFeedback>
           </FormGroup>
           <FormGroup>
             <Label for="position">Posición</Label>
@@ -77,7 +123,9 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
               type="text"
               value={experience.position}
               onChange={handleChange}
+              invalid={Object.keys(errors).includes("position")}
             />
+            <FormFeedback>{errors["position"]}</FormFeedback>
           </FormGroup>
           <FormGroup>
             <Label for="from">Desde</Label>
@@ -88,7 +136,9 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
               type="date"
               value={experience.from}
               onChange={handleChange}
+              invalid={Object.keys(errors).includes("from")}
             />
+            <FormFeedback>{errors["from"]}</FormFeedback>
           </FormGroup>
           <FormGroup>
             <Label for="until">Hasta</Label>
@@ -99,7 +149,9 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
               type="date"
               value={experience.until}
               onChange={handleChange}
+              invalid={Object.keys(errors).includes("until")}
             />
+            <FormFeedback>{errors["until"]}</FormFeedback>
           </FormGroup>
           <FormGroup>
             <Label for="salary">Salario</Label>
@@ -118,7 +170,12 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
         <Button type="button" className="btn btn-secondary" onClick={handleCancel}>
           Cancelar
         </Button>
-        <Button type="button" className="btn btn-primary" onClick={handleSave} disabled={isLoading}>
+        <Button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleSave}
+          disabled={isLoading || Object.keys(errors).length}
+        >
           Confirmar
         </Button>
       </ModalFooter>

@@ -1,8 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import {
+  Button,
+  Form,
+  FormFeedback,
+  FormGroup,
+  Input,
+  Label,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from "reactstrap";
 import { get, send } from "../../utils/apiService";
 
 export const PositionModal = ({ isOpen, toggle, id }) => {
+  const [errors, setErrors] = useState({
+    name: "Nombre no puede estar vacio",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [position, setPosition] = useState({
     id: 0,
@@ -20,9 +34,28 @@ export const PositionModal = ({ isOpen, toggle, id }) => {
       minimumSalary: 0,
       maximumSalary: 0,
     });
+
+    setErrors({
+      name: "Nombre no puede estar vacio",
+    });
   };
 
   const handleChange = ({ target: { name, value } }) => {
+    let prevErrors = errors;
+    delete prevErrors[name];
+    setErrors(prevErrors);
+
+    if (name === "name" && value === "") {
+      setErrors((errors) => ({ ...errors, [name]: "Nombre no puede estar vacio" }));
+    }
+
+    if (name === "minimumSalary" && Number(value) > Number(position.maximumSalary)) {
+      setErrors((errors) => ({ ...errors, [name]: "Salario minimo no puede ser mayor al salario maximo" }));
+    }
+
+    if (name === "maximumSalary" && Number(position.minimumSalary) > Number(value)) {
+      setErrors((errors) => ({ ...errors, [name]: "Salario maximo no puede ser menor al salario minimo" }));
+    }
     setPosition((position) => ({ ...position, [name]: name === "risk" ? Number(value) : value }));
   };
 
@@ -80,7 +113,9 @@ export const PositionModal = ({ isOpen, toggle, id }) => {
               type="text"
               value={position.name}
               onChange={handleChange}
+              invalid={Object.keys(errors).includes("name")}
             />
+            <FormFeedback>{errors["name"]}</FormFeedback>
           </FormGroup>
           <FormGroup>
             <Label for="risk">Riesgo</Label>
@@ -99,7 +134,9 @@ export const PositionModal = ({ isOpen, toggle, id }) => {
               type="number"
               value={position.minimumSalary}
               onChange={handleChange}
+              invalid={Object.keys(errors).includes("minimumSalary")}
             />
+            <FormFeedback>{errors["minimumSalary"]}</FormFeedback>
           </FormGroup>
           <FormGroup>
             <Label for="maximumSalary">Salario Maximo</Label>
@@ -110,7 +147,9 @@ export const PositionModal = ({ isOpen, toggle, id }) => {
               type="number"
               value={position.maximumSalary}
               onChange={handleChange}
+              invalid={Object.keys(errors).includes("maximumSalary")}
             />
+            <FormFeedback>{errors["maximumSalary"]}</FormFeedback>
           </FormGroup>
         </Form>
       </ModalBody>
@@ -118,7 +157,12 @@ export const PositionModal = ({ isOpen, toggle, id }) => {
         <Button type="button" className="btn btn-secondary" onClick={handleCancel}>
           Cancelar
         </Button>
-        <Button type="button" className="btn btn-primary" onClick={handleSave} disabled={isLoading}>
+        <Button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleSave}
+          disabled={isLoading || Object.keys(errors).length}
+        >
           Confirmar
         </Button>
       </ModalFooter>

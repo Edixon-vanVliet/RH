@@ -1,16 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import {
+  Button,
+  Form,
+  FormFeedback,
+  FormGroup,
+  Input,
+  Label,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from "reactstrap";
 import { get, send } from "../../utils/apiService";
 
 export const LanguageModal = ({ isOpen, toggle, id }) => {
+  const [errors, setErrors] = useState({
+    name: "Nombre no puede estar vacio",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState({ id: 0, name: "" });
 
   const clean = () => {
     setLanguage({ id: 0, name: "" });
+    setErrors({
+      name: "Nombre no puede estar vacio",
+    });
   };
 
   const handleChange = ({ target: { name, value } }) => {
+    let prevErrors = errors;
+    delete prevErrors[name];
+    setErrors(prevErrors);
+
+    if (name === "name" && value === "") {
+      setErrors((errors) => ({ ...errors, [name]: "Nombre no puede estar vacio" }));
+    }
+
     setLanguage((language) => ({ ...language, [name]: value }));
   };
 
@@ -68,7 +93,9 @@ export const LanguageModal = ({ isOpen, toggle, id }) => {
               type="text"
               value={language.name}
               onChange={handleChange}
+              invalid={Object.keys(errors).includes("name")}
             />
+            <FormFeedback>{errors["name"]}</FormFeedback>
           </FormGroup>
         </Form>
       </ModalBody>
@@ -76,7 +103,12 @@ export const LanguageModal = ({ isOpen, toggle, id }) => {
         <Button type="button" className="btn btn-secondary" onClick={handleCancel}>
           Cancelar
         </Button>
-        <Button type="button" className="btn btn-primary" onClick={handleSave} disabled={isLoading}>
+        <Button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleSave}
+          disabled={isLoading || Object.keys(errors).length}
+        >
           Confirmar
         </Button>
       </ModalFooter>
