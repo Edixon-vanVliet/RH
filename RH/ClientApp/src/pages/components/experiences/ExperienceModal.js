@@ -70,6 +70,10 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
       setErrors((errors) => ({ ...errors, [name]: "Fecha final no puede ser menor a la fecha de inicio" }));
     }
 
+    if (name === "salary" && parseFloat(value) < 0) {
+      setErrors((errors) => ({ ...errors, [name]: "Salario no puede ser menor a 0" }));
+    }
+
     setExperience((experience) => ({ ...experience, [name]: value }));
   };
 

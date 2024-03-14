@@ -17,6 +17,7 @@ import { send } from "../../utils/apiService";
 import { get } from "jquery";
 import { SkillsTable } from "../components/skills";
 import { ExperiencesTable } from "../components/experiences/ExperiencesTable";
+import { isValidCedula } from "../../utils/checkCedula";
 
 export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
   const [errors, setErrors] = useState({});
@@ -64,6 +65,10 @@ export const EmployeeModal = ({ isOpen, toggle, id, userRole }) => {
 
     if (name === "name" && value === "") {
       setErrors((errors) => ({ ...errors, [name]: "Nombre no puede estar vacio" }));
+    }
+
+    if (name === "cedula" && !isValidCedula(value)) {
+      setErrors((errors) => ({ ...errors, [name]: "Cedula invalida" }));
     }
 
     if (name === "cedula" && value === "") {

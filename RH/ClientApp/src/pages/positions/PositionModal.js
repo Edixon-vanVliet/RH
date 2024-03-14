@@ -50,6 +50,16 @@ export const PositionModal = ({ isOpen, toggle, id }) => {
     }
 
     if (name === "minimumSalary" || name === "maximumSalary") {
+      if (name === "minimumSalary" && parseFloat(value) < 0) {
+        setErrors((errors) => ({ ...errors, [name]: "Salario minimo no puede ser menor a 0" }));
+        return;
+      }
+
+      if (name === "maximumSalary" && parseFloat(value) < 0) {
+        setErrors((errors) => ({ ...errors, [name]: "Salario maximo no puede ser menor a 0" }));
+        return;
+      }
+
       delete prevErrors["minimumSalary"];
       delete prevErrors["maximumSalary"];
       setErrors(prevErrors);

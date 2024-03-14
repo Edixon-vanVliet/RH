@@ -16,6 +16,7 @@ import {
 import { get, send } from "../../utils/apiService";
 import { SkillsTable } from "../components/skills";
 import { ExperiencesTable } from "../components/experiences/ExperiencesTable";
+import { isValidCedula } from "../../utils/checkCedula";
 
 export const CandidateModal = ({ isOpen, toggle, id }) => {
   const [errors, setErrors] = useState({
@@ -72,8 +73,16 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
       setErrors((errors) => ({ ...errors, [name]: "Nombre no puede estar vacio" }));
     }
 
+    if (name === "cedula" && !isValidCedula(value)) {
+      setErrors((errors) => ({ ...errors, [name]: "Cedula invalida" }));
+    }
+
     if (name === "cedula" && value === "") {
       setErrors((errors) => ({ ...errors, [name]: "Cedula no puede estar vacio" }));
+    }
+
+    if (name === "salary" && parseFloat(value) < 0) {
+      setErrors((errors) => ({ ...errors, [name]: "Salario no puede ser menor a 0" }));
     }
 
     if (name === "languages") {
