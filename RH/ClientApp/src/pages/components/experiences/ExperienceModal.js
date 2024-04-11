@@ -42,6 +42,8 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
     setErrors({
       company: "Compañia no puede estar vacio",
       position: "Posicion no puede estar vacio",
+      from: "Fecha de inicio no puede estar vacio",
+      until: "Fecha final no puede estar vacio",
     });
   };
 
@@ -62,11 +64,11 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
       setErrors((errors) => ({ ...errors, [name]: "Fecha de inicio no puede ser mayor a la fecha final" }));
     }
 
-    if (name === "from" && new Date(value) > new Date()) {
+    if (name === "from" && new Date(`${value} `) > new Date()) {
       setErrors((errors) => ({ ...errors, [name]: "Fecha de inicio no puede ser mayor a la de hoy" }));
     }
 
-    if (name === "until" && new Date(value) < new Date(experience.from)) {
+    if (name === "until" && new Date(`${value} `) < new Date(`${experience.from} `)) {
       setErrors((errors) => ({ ...errors, [name]: "Fecha final no puede ser menor a la fecha de inicio" }));
     }
 
@@ -169,7 +171,9 @@ export const ExperienceModal = ({ isOpen, toggle, currentExperience, onChange })
               type="number"
               value={experience.salary}
               onChange={handleChange}
+              invalid={Object.keys(errors).includes("salary")}
             />
+            <FormFeedback>{errors["salary"]}</FormFeedback>
           </FormGroup>
         </Form>
       </ModalBody>

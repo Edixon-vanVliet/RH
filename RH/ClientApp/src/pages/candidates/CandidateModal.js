@@ -240,7 +240,9 @@ export const CandidateModal = ({ isOpen, toggle, id }) => {
                   type="number"
                   value={candidate.salary}
                   onChange={handleChange}
+                  invalid={Object.keys(errors).includes("salary")}
                 />
+                <FormFeedback>{errors["salary"]}</FormFeedback>
               </FormGroup>
             </Col>
             <Col>
